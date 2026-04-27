@@ -8,22 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; --danger: #ff453a; }
+        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; }
         .dark { --bg: #0B0B0F; --card: #1C1C1E; --text: #FFFFFF; --text2: #A1A1A6; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; min-height: 100vh; }
         .header-lumina { background: #5856D6; color: white; padding: 15px; text-align: center; font-weight: 900; font-style: italic; position: sticky; top: 0; z-index: 100; }
         .debt-banner { background: #1c1c1e; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .debt-banner p { font-size: 9px; opacity: 0.5; text-transform: uppercase; }
         .acc-wrap { display: flex; gap: 12px; overflow-x: auto; padding: 20px; scrollbar-width: none; }
         .acc-card { min-width: 160px; padding: 16px; border-radius: 20px; color: white; }
-        .card { background: var(--card); border-radius: 20px; padding: 16px; margin: 0 16px 12px; }
-        .tx-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.05); }
+        .card { background: var(--card); border-radius: 20px; padding: 16px; margin: 0 16px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .bnav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid rgba(128,128,128,0.1); padding: 10px 0 30px; display: flex; justify-content: space-around; z-index: 100; }
         .bnav-btn { background: none; border: none; color: var(--text2); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .bnav-btn.active { color: var(--primary); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .tx-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.05); }
     </style>
 </head>
 <body>
@@ -39,14 +39,14 @@
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
                 <i class="fas fa-brain"></i><span style="font-size: 10px; font-weight: bold;">INSIGHT DA LUMINA</span>
             </div>
-            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Aguardando importação para analisar seus dados...</p>
+            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Analisando dados...</p>
         </div>
 
         <div class="card" style="border: 2px dashed var(--primary); text-align: center; background: transparent;">
-            <p style="font-size: 11px; margin-bottom: 8px; font-weight: bold;">IMPORTAR EXTRATOS (BB OU NUBANK)</p>
+            <p style="font-size: 11px; margin-bottom: 8px; font-weight: bold;">IMPORTAR EXTRATO (BB OU NUBANK)</p>
             <input type="file" id="csvFile" accept=".csv" style="display: none;">
             <button onclick="document.getElementById('csvFile').click()" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%;">
-                <i class="fas fa-file-upload"></i> SELECIONAR ARQUIVO .CSV
+                <i class="fas fa-file-upload"></i> SELECIONAR ARQUIVO CSV
             </button>
         </div>
 
@@ -91,29 +91,24 @@
         async function fetchData() {
             const { data } = await _supabase.from('transacoes').select('*').order('created_at', { ascending: false });
             render(data || []);
-            updateAI(data || []);
         }
 
         function render(list) {
-            let saldos = { bb: 0, nu: 0 };
+            let s = { bb: 0, nu: 0 };
             let html = '';
             list.forEach(t => {
                 const v = Number(t.valor);
                 const b = t.banco.toLowerCase();
-                if (saldos[b] !== undefined) saldos[b] += v;
+                if (s[b] !== undefined) s[b] += v;
                 html += `<div class="tx-item"><div style="flex:1"><p style="font-weight:bold;font-size:14px">${t.descricao}</p><p style="font-size:10px;color:var(--text2)">${b.toUpperCase()}</p></div><span style="font-weight:900;color:${v > 0 ? 'var(--success)' : 'var(--text)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
             });
             document.getElementById('lista-transacoes').innerHTML = html || '<p style="text-align:center;padding:20px;opacity:0.5">Sem dados.</p>';
-            document.getElementById('saldo-bb').innerText = saldos.bb.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('saldo-nu').innerText = saldos.nu.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('saldo-livre').innerText = (saldos.bb + saldos.nu).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-        }
-
-        function updateAI(list) {
-            const total = list.reduce((acc, t) => acc + Number(t.valor), 0);
+            document.getElementById('saldo-bb').innerText = s.bb.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-nu').innerText = s.nu.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-livre').innerText = (s.bb + s.nu).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            
             const msg = document.getElementById('ai-insight');
-            if (total > 0) msg.innerText = "Rubens, saldo livre em alta! Excelente momento para focar na amortização da Porto Seguro.";
-            else msg.innerText = "Foco nas corridas de taxi hoje, Rubens! Vamos equilibrar esse extrato.";
+            msg.innerText = (s.bb + s.nu) > 0 ? "Rubens, saldo livre positivo! Foco na amortização da Porto Seguro." : "Foco nas corridas hoje para equilibrar o saldo livre!";
         }
 
         document.getElementById('csvFile').addEventListener('change', function(e) {
@@ -123,20 +118,21 @@
                 skipEmptyLines: true,
                 complete: async function(results) {
                     const formatted = results.data.map(row => {
-                        // Identifica se é Banco do Brasil (tem coluna "Lançamento") ou Nubank (tem "Descrição")
                         const isBB = row.Lançamento !== undefined;
-                        
+                        let valStr = isBB ? row.Valor : row.Valor;
+                        // Trata o formato de número do BB (1.551,58 -> 1551.58)
+                        let v = isBB ? parseFloat(String(valStr).replace(/\./g, '').replace(',', '.')) : parseFloat(valStr);
                         return {
                             descricao: isBB ? row.Lançamento : (row.Descrição || "Lançamento"),
-                            valor: isBB ? parseFloat(String(row.Valor).replace('.', '').replace(',', '.')) : parseFloat(row.Valor || 0),
+                            valor: isNaN(v) ? 0 : v,
                             banco: isBB ? "bb" : "nu",
                             categoria: "Taxi"
                         };
-                    }).filter(item => !isNaN(item.valor) && item.descricao !== "Saldo do dia"); // Limpa linhas inúteis
+                    }).filter(i => i.valor !== 0 && i.descricao !== "Saldo do dia" && i.descricao !== "Saldo Anterior");
 
                     const { error } = await _supabase.from('transacoes').insert(formatted);
-                    if (!error) { alert("Importado com sucesso!"); fetchData(); }
-                    else alert("Erro ao salvar. Verifique se a tabela 'transacoes' no Supabase tem as colunas: descricao, valor, banco, categoria.");
+                    if (!error) { alert("Sucesso!"); fetchData(); }
+                    else alert("Erro: Tabela 'transacoes' não encontrada ou colunas incorretas.");
                 }
             });
         });
