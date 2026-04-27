@@ -2,61 +2,62 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Lumina Intelligence</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 120px; font-family: -apple-system, sans-serif; }
-        .header-lumina { background: #5856D6; color: white; padding: 15px; text-align: center; font-weight: 900; font-style: italic; }
-        .card { background: var(--card); border-radius: 20px; padding: 16px; margin: 12px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .bnav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid #ddd; padding: 10px 0 30px; display: flex; justify-content: space-around; }
-        .bnav-btn { background: none; border: none; color: var(--text2); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .bnav-btn.active { color: var(--primary); }
-        .tx-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --primary: #5856D6; --success: #10b981; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding-bottom: 100px; }
+        .card { background: var(--card); border-radius: 15px; padding: 15px; margin: 10px 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-import { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+        .bnav { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #ddd; display: flex; justify-content: space-around; padding: 10px 0 25px; }
+        .tx-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
 </head>
 <body>
-    <div class="header-lumina">LUMINA INTELLIGENCE</div>
+    <div style="background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold;">LUMINA INTELLIGENCE</div>
 
     <main id="home" class="tab-content active">
         <div class="card" style="background: linear-gradient(135deg, #5856D6, #BF5AFC); color: white;">
-            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Pronto para importar seus arquivos, Rubens!</p>
+            <p id="ai-insight">Carregando análise para Rubens...</p>
         </div>
 
-        <div class="card" style="border: 2px dashed var(--primary); text-align: center;">
-            <p style="font-size: 11px; margin-bottom: 8px; font-weight: bold;">IMPORTAR EXTRATO (BB OU NUBANK)</p>
+        <div class="card">
+            <p style="font-size: 12px; margin-bottom: 10px; font-weight: bold;">IMPORTAR NUBANK OU BB</p>
             <input type="file" id="csvFile" accept=".csv" style="display: none;">
-            <button onclick="document.getElementById('csvFile').click()" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%;">
+            <button class="btn-import" onclick="document.getElementById('csvFile').click()">
                 <i class="fas fa-file-upload"></i> SELECIONAR CSV
             </button>
         </div>
 
-        <div class="card">
-            <div style="display:flex; justify-content: space-between; margin-bottom: 15px;">
-                <span>BB: <b id="saldo-bb">R$ 0,00</b></span>
-                <span>NU: <b id="saldo-nu">R$ 0,00</b></span>
-            </div>
-            <h4 style="margin-bottom: 10px;">Extrato</h4>
-            <div id="lista-transacoes"></div>
+        <div class="card" style="display: flex; justify-content: space-between; text-align: center;">
+            <div><small>BANCO DO BRASIL</small><br><b id="saldo-bb">R$ 0,00</b></div>
+            <div><small>NUBANK</small><br><b id="saldo-nu">R$ 0,00</b></div>
+        </div>
+
+        <div class="card" id="lista-transacoes">
+            <p style="text-align: center; opacity: 0.5;">Aguardando dados...</p>
         </div>
     </main>
 
     <div id="projetos" class="tab-content">
         <div class="card">
-            <p style="font-size: 10px; font-weight: bold; color: var(--primary);">PORTO SEGURO (CONSORCIO)</p>
-            <h2 style="font-weight: 900;">R$ 93.848,96</h2>
-            <p style="color: var(--success); font-weight: bold;">40% PAGO</p>
+            <p style="font-size: 10px; font-weight: bold;">CONSORCIO PORTO SEGURO</p>
+            <h2 style="margin: 5px 0;">R$ 93.848,96</h2>
+            <div style="background: #eee; height: 10px; border-radius: 5px;">
+                <div style="background: var(--success); width: 40%; height: 100%; border-radius: 5px;"></div>
+            </div>
+            <p style="font-size: 11px; margin-top: 5px; color: var(--success);">40% PAGO</p>
         </div>
     </div>
 
     <nav class="bnav">
-        <button class="bnav-btn active" onclick="showTab('home', this)"><i class="fas fa-wallet"></i>HOME</button>
-        <button class="bnav-btn" onclick="showTab('projetos', this)"><i class="fas fa-home"></i>PROJETOS</button>
+        <button onclick="showTab('home')" style="border:none; background:none; color: var(--primary); font-weight: bold;">HOME</button>
+        <button onclick="showTab('projetos')" style="border:none; background:none; color: #888;">PROJETOS</button>
     </nav>
 
     <script>
@@ -65,20 +66,21 @@
         const _supabase = supabase.createClient(S_URL, S_KEY);
 
         async function fetchData() {
-            const { data } = await _supabase.from('transacoes').select('*').order('created_at', { ascending: false });
+            const { data } = await _supabase.from('extratos').select('*').order('data', { ascending: false });
             if (data) render(data);
         }
 
         function render(list) {
-            let s = { bb: 0, nu: 0 }, html = '';
+            let sBB = 0, sNU = 0, html = '';
             list.forEach(t => {
-                const v = Number(t.valor);
-                if (s[t.banco]) s[t.banco] += v; else s[t.banco] = v;
-                html += `<div class="tx-item"><div><b>${t.descricao}</b><br><small>${t.banco.toUpperCase()}</small></div><span>${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+                const v = parseFloat(t.valor);
+                if (t.banco === 'bb') sBB += v; else sNU += v;
+                html += `<div class="tx-item"><div><b>${t.descrição}</b><br><small>${t.data}</small></div><b style="color:${v > 0 ? '#10b981' : '#1c1c1e'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</b></div>`;
             });
             document.getElementById('lista-transacoes').innerHTML = html;
-            document.getElementById('saldo-bb').innerText = (s.bb || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('saldo-nu').innerText = (s.nu || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-bb').innerText = sBB.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-nu').innerText = sNU.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('ai-insight').innerText = (sBB + sNU > 0) ? "Rubens, saldo livre em alta! Excelente para o consórcio Porto." : "Foco nas corridas hoje para equilibrar o saldo!";
         }
 
         document.getElementById('csvFile').addEventListener('change', function(e) {
@@ -88,34 +90,29 @@
                 skipEmptyLines: true,
                 complete: async function(results) {
                     const formatted = results.data.map(row => {
-                        // Detecta BB (coluna Lançamento) ou Nubank (Descrição)
-                        const isBB = row.hasOwnProperty('Lançamento') || row.hasOwnProperty('"Lançamento"');
-                        const desc = isBB ? (row.Lançamento || row['"Lançamento"']) : row.Descrição;
-                        let valRaw = isBB ? (row.Valor || row['"Valor"']) : row.Valor;
-                        
-                        // Limpa o valor para formato numérico puro
-                        let val = parseFloat(String(valRaw).replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.'));
+                        const isBB = row.hasOwnProperty('"Lançamento"') || row.hasOwnProperty('Lançamento');
+                        const rawVal = isBB ? (row['"Valor"'] || row.Valor) : row.Valor;
+                        const cleanVal = parseFloat(String(rawVal).replace(/\./g, '').replace(',', '.'));
                         
                         return {
-                            descricao: String(desc).replace(/"/g, ''),
-                            valor: isNaN(val) ? 0 : val,
-                            banco: isBB ? "bb" : "nu",
-                            categoria: "Taxi"
+                            data: isBB ? (row['"Data"'] || row.Data) : row.Data,
+                            descrição: (isBB ? (row['"Lançamento"'] || row.Lançamento) : row.Descrição) || 'Sem descrição',
+                            valor: isNaN(cleanVal) ? 0 : cleanVal,
+                            identificador: isBB ? (row['"N° documento"'] || row['N° documento']) : (row.Identificador || 'N/A'),
+                            banco: isBB ? "bb" : "nu"
                         };
-                    }).filter(i => i.valor !== 0 && i.descricao !== "Saldo do dia");
+                    }).filter(i => i.valor !== 0 && i.descrição !== 'Saldo do dia');
 
-                    const { error } = await _supabase.from('transacoes').insert(formatted);
-                    if (!error) { alert("Importado com sucesso!"); fetchData(); }
-                    else { console.error(error); alert("Erro ao salvar. Verifique se criou a tabela no Supabase."); }
+                    const { error } = await _supabase.from('extratos').insert(formatted);
+                    if (!error) { alert("Sucesso!"); fetchData(); }
+                    else { console.error(error); alert("Erro ao salvar na tabela 'extratos'."); }
                 }
             });
         });
 
-        function showTab(id, btn) {
+        function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
         }
         fetchData();
     </script>
