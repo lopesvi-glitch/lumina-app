@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; }
+        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; --danger: #ff453a; }
         .dark { --bg: #0B0B0F; --card: #1C1C1E; --text: #FFFFFF; --text2: #A1A1A6; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
@@ -39,24 +39,23 @@
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
                 <i class="fas fa-brain"></i><span style="font-size: 10px; font-weight: bold;">INSIGHT DA LUMINA</span>
             </div>
-            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Analisando seu fluxo financeiro, Rubens...</p>
+            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Aguardando importação para analisar seus dados...</p>
         </div>
 
         <div class="card" style="border: 2px dashed var(--primary); text-align: center; background: transparent;">
-            <p style="font-size: 11px; margin-bottom: 8px; font-weight: bold;">IMPORTAR EXTRATO/CORRIDAS (CSV)</p>
+            <p style="font-size: 11px; margin-bottom: 8px; font-weight: bold;">IMPORTAR EXTRATOS (BB OU NUBANK)</p>
             <input type="file" id="csvFile" accept=".csv" style="display: none;">
             <button onclick="document.getElementById('csvFile').click()" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%;">
-                <i class="fas fa-file-upload"></i> SELECIONAR ARQUIVO CSV
+                <i class="fas fa-file-upload"></i> SELECIONAR ARQUIVO .CSV
             </button>
         </div>
 
         <section class="acc-wrap">
             <div class="acc-card" style="background: #FFD700; color: #0038a8;"><p style="font-size: 9px; font-weight: bold;">BANCO DO BRASIL</p><h3 id="saldo-bb">R$ 0,00</h3></div>
-            <div class="acc-card" style="background: #4b1d6e;"><p style="font-size: 9px; font-weight: bold;">NUBANK PJ</p><h3 id="saldo-pj">R$ 0,00</h3></div>
-            <div class="acc-card" style="background: #8A05BE;"><p style="font-size: 9px; font-weight: bold;">NUBANK PF</p><h3 id="saldo-pf">R$ 0,00</h3></div>
+            <div class="acc-card" style="background: #8A05BE;"><p style="font-size: 9px; font-weight: bold;">NUBANK</p><h3 id="saldo-nu">R$ 0,00</h3></div>
         </section>
 
-        <div style="padding: 0 20px 10px;"><h4 style="font-weight: 900;">Extrato Atualizado</h4></div>
+        <div style="padding: 0 20px 10px;"><h4 style="font-weight: 900;">Extrato Consolidado</h4></div>
         <div class="card" id="lista-transacoes"></div>
     </main>
 
@@ -79,7 +78,7 @@
     </div>
 
     <nav class="bnav">
-        <button class="bnav-btn active" onclick="showTab('home', this)"><i class="fas fa-wallet"></i>CARTEIRA</button>
+        <button class="bnav-btn active" onclick="showTab('home', this)"><i class="fas fa-wallet"></i>HOME</button>
         <button class="bnav-btn" onclick="showTab('projetos', this)"><i class="fas fa-home"></i>PROJETOS</button>
         <button class="bnav-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i>DARK</button>
     </nav>
@@ -96,27 +95,25 @@
         }
 
         function render(list) {
-            let saldos = { bb: 1794.62, pj: 372.63, pf: -472.69 };
+            let saldos = { bb: 0, nu: 0 };
             let html = '';
             list.forEach(t => {
                 const v = Number(t.valor);
-                const b = (t.banco || 'pj').toLowerCase();
+                const b = t.banco.toLowerCase();
                 if (saldos[b] !== undefined) saldos[b] += v;
-                html += `<div class="tx-item"><div style="flex:1"><p style="font-weight:bold;font-size:14px">${t.descricao}</p><p style="font-size:10px;color:var(--text2)">${t.categoria} • ${b.toUpperCase()}</p></div><span style="font-weight:900;color:${v > 0 ? '#10b981' : '#ff453a'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+                html += `<div class="tx-item"><div style="flex:1"><p style="font-weight:bold;font-size:14px">${t.descricao}</p><p style="font-size:10px;color:var(--text2)">${b.toUpperCase()}</p></div><span style="font-weight:900;color:${v > 0 ? 'var(--success)' : 'var(--text)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
             });
-            document.getElementById('lista-transacoes').innerHTML = html || '<p style="text-align:center;padding:20px;opacity:0.5">Sem dados importados.</p>';
+            document.getElementById('lista-transacoes').innerHTML = html || '<p style="text-align:center;padding:20px;opacity:0.5">Sem dados.</p>';
             document.getElementById('saldo-bb').innerText = saldos.bb.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('saldo-pj').innerText = saldos.pj.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('saldo-pf').innerText = saldos.pf.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            const total = saldos.bb + saldos.pj + saldos.pf;
-            document.getElementById('saldo-livre').innerText = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-nu').innerText = saldos.nu.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-livre').innerText = (saldos.bb + saldos.nu).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
         }
 
         function updateAI(list) {
             const total = list.reduce((acc, t) => acc + Number(t.valor), 0);
             const msg = document.getElementById('ai-insight');
-            if (total > 0) msg.innerText = "Rubens, saldo livre positivo! Ótimo momento para focar na amortização da Porto Seguro.";
-            else msg.innerText = "Dia de movimento intenso? Mantenha o foco nas corridas de taxi para equilibrar o saldo mensal.";
+            if (total > 0) msg.innerText = "Rubens, saldo livre em alta! Excelente momento para focar na amortização da Porto Seguro.";
+            else msg.innerText = "Foco nas corridas de taxi hoje, Rubens! Vamos equilibrar esse extrato.";
         }
 
         document.getElementById('csvFile').addEventListener('change', function(e) {
@@ -125,15 +122,21 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: async function(results) {
-                    const formatted = results.data.map(row => ({
-                        descricao: row.descricao || row.Descricao || row.Nome || "Lançamento",
-                        valor: parseFloat(String(row.valor || row.Valor || 0).replace(',', '.')),
-                        banco: (row.banco || row.Banco || "pj").toLowerCase(),
-                        categoria: row.categoria || row.Categoria || "Taxi"
-                    }));
+                    const formatted = results.data.map(row => {
+                        // Identifica se é Banco do Brasil (tem coluna "Lançamento") ou Nubank (tem "Descrição")
+                        const isBB = row.Lançamento !== undefined;
+                        
+                        return {
+                            descricao: isBB ? row.Lançamento : (row.Descrição || "Lançamento"),
+                            valor: isBB ? parseFloat(String(row.Valor).replace('.', '').replace(',', '.')) : parseFloat(row.Valor || 0),
+                            banco: isBB ? "bb" : "nu",
+                            categoria: "Taxi"
+                        };
+                    }).filter(item => !isNaN(item.valor) && item.descricao !== "Saldo do dia"); // Limpa linhas inúteis
+
                     const { error } = await _supabase.from('transacoes').insert(formatted);
                     if (!error) { alert("Importado com sucesso!"); fetchData(); }
-                    else alert("Erro ao importar. Verifique se o arquivo tem as colunas: descricao, valor, banco, categoria.");
+                    else alert("Erro ao salvar. Verifique se a tabela 'transacoes' no Supabase tem as colunas: descricao, valor, banco, categoria.");
                 }
             });
         });
