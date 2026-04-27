@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lumina Intelligence</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --text2: #8E8E93; --primary: #5856D6; --success: #10b981; }
+        .dark { --bg: #0B0B0F; --card: #1C1C1E; --text: #FFFFFF; --text2: #A1A1A6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
+        .header-lumina { background: #5856D6; color: white; padding: 15px; text-align: center; font-weight: 900; font-style: italic; position: sticky; top: 0; z-index: 100; }
+        .debt-banner { background: #1c1c1e; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .debt-banner p { font-size: 9px; opacity: 0.5; text-transform: uppercase; margin-bottom: 4px; }
+        .acc-wrap { display: flex; gap: 12px; overflow-x: auto; padding: 20px; scrollbar-width: none; }
+        .acc-card { min-width: 160px; padding: 16px; border-radius: 20px; color: white; }
+        .card { background: var(--card); border-radius: 20px; padding: 16px; margin: 0 16px 12px; }
+        .tx-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.05); }
+        .bnav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid rgba(128,128,128,0.1); padding: 10px 0 25px; display: flex; justify-content: space-around; z-index: 100; }
+        .bnav-btn { background: none; border: none; color: var(--text2); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .bnav-btn.active { color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="header-lumina">LUMINA INTELLIGENCE</div>
+
+    <div class="debt-banner">
+        <div><p>Dívida Total</p><h2 style="font-size: 22px; font-weight: 900;">R$ 282.265,01</h2></div>
+        <div style="text-align: right;"><p>Saldo Livre</p><h2 id="saldo-livre" style="color: var(--success); font-size: 22px; font-weight: 900;">R$ 0,00</h2></div>
+    </div>
+
+    <main id="home" class="tab-content active">
+        <div class="card" style="background: linear-gradient(135deg, #5856D6, #BF5AFC); color: white; border: none; margin-top: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <i class="fas fa-brain"></i><span style="font-size: 10px; font-weight: bold;">INSIGHT DA LUMINA</span>
+            </div>
+            <p id="ai-insight" style="font-size: 13px; font-weight: 500;">Sincronizando seus dados do taxi...</p>
+        </div>
+
+        <section class="acc-wrap">
+            <div class="acc-card" style="background: #FFD700; color: #0038a8;"><p style="font-size: 9px; font-weight: bold;">BANCO DO BRASIL</p><h3 id="saldo-bb">R$ 1.794,62</h3></div>
+            <div class="acc-card" style="background: #4b1d6e; color: white;"><p style="font-size: 9px; font-weight: bold;">NUBANK PJ</p><h3 id="saldo-pj">R$ 372,63</h3></div>
+            <div class="acc-card" style="background: #8A05BE; color: white;"><p style="font-size: 9px; font-weight: bold;">NUBANK PF</p><h3 id="saldo-pf">R$ -472,69</h3></div>
+        </section>
+
+        <div style="padding: 0 20px 10px;"><h4 style="font-weight: 900;">Lançamentos Reais</h4></div>
+        <div class="card" id="lista-transacoes"></div>
+    </main>
+
+    <div id="casa" class="tab-content" style="padding: 40px 24px; text-align: center;">
+        <h2 style="font-weight: 900; margin-bottom: 20px;">CASA (CAIXA)</h2>
+        <div class="card" style="padding: 40px 20px;">
+            <div style="font-size: 48px; font-weight: 900; color: var(--success);">46%</div>
+            <p style="opacity: 0.5;">PAGO</p>
+            <h3 style="margin-top: 20px;">R$ 188.416,03</h3>
+        </div>
+    </div>
+
+    <div id="carro" class="tab-content" style="padding: 40px 24px; text-align: center;">
+        <h2 style="font-weight: 900; margin-bottom: 20px;">CARRO (PORTO)</h2>
+        <div class="card" style="padding: 40px 20px;">
+            <div style="font-size: 48px; font-weight: 900; color: var(--success);">40%</div>
+            <p style="opacity: 0.5;">PAGO</p>
+            <h3 style="margin-top: 20px;">R$ 93.848,96</h3>
+        </div>
+    </div>
+
+    <nav class="bnav">
+        <button class="bnav-btn active" onclick="showTab('home')"><i class="fas fa-wallet" style="font-size: 18px;"></i>CARTEIRA</button>
+        <button class="bnav-btn" onclick="showTab('casa')"><i class="fas fa-home" style="font-size: 18px;"></i>CASA</button>
+        <button class="bnav-btn" onclick="showTab('carro')"><i class="fas fa-car" style="font-size: 18px;"></i>CARRO</button>
+        <button class="bnav-btn" onclick="toggleDarkMode()"><i class="fas fa-moon" style="font-size: 18px;"></i>DARK</button>
+    </nav>
+
+    <script>
+        const S_URL = 'https://mxfpblywlowqpjllzhjh.supabase.co';
+        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZnBibHdsb3dxcGpsbHpoamhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNzQyMzMsImV4cCI6MjA5Mjc1MDIzM30.jmT4WsxJFg-PboJpS2XTZ-flUcNPC8jHpkqWCAO6EgY';
+        const _supabase = supabase.createClient(S_URL, S_KEY);
+
+        async function fetchData() {
+            const { data } = await _supabase.from('transacoes').select('*').order('created_at', { ascending: false });
+            if (data) { render(data); updateAI(data); }
+        }
+
+        function render(list) {
+            let saldos = { bb: 1794.62, pj: 372.63, pf: -472.69 };
+            let html = '';
+            list.forEach(t => {
+                const v = Number(t.valor);
+                saldos[t.banco] = (saldos[t.banco] || 0) + v;
+                html += `<div class="tx-item"><div style="flex:1"><p style="font-weight:bold;font-size:14px">${t.descricao}</p><p style="font-size:10px;color:var(--text2)">${t.categoria}</p></div><span style="font-weight:900;color:${v > 0 ? '#10b981' : 'var(--text)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+            });
+            document.getElementById('lista-transacoes').innerHTML = html;
+            document.getElementById('saldo-bb').innerText = saldos.bb.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-pj').innerText = saldos.pj.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('saldo-pf').innerText = saldos.pf.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            const total = saldos.bb + saldos.pj + saldos.pf;
+            document.getElementById('saldo-livre').innerText = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+        }
+
+        function updateAI(list) {
+            const total = list.reduce((acc, t) => acc + Number(t.valor), 0);
+            const msg = document.getElementById('ai-insight');
+            msg.innerText = total > 0 ? "Rubens, saldo positivo! Bom momento para adiantar uma parcela da construtora." : "Dia de muito trânsito? Foque nas corridas para equilibrar o saldo livre de hoje.";
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+        fetchData();
+    </script>
+</body>
+</html>
